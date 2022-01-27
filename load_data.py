@@ -3,6 +3,7 @@ from scipy.io import loadmat, savemat
 from torch.utils.data import DataLoader
 import numpy as np
 
+
 class CustomDataSet(Dataset):
     def __init__(
             self,
@@ -32,14 +33,35 @@ def ind2vec(ind, N=None):
         N = ind.max() + 1
     return np.arange(N) == np.repeat(ind, N, axis=1)
 
-def get_loader(path, batch_size):
-    img_train = loadmat(path+"train_img.mat")['train_img']
-    img_test = loadmat(path + "test_img.mat")['test_img']
-    text_train = loadmat(path+"train_txt.mat")['train_txt']
-    text_test = loadmat(path + "test_txt.mat")['test_txt']
-    label_train = loadmat(path+"train_img_lab.mat")['train_img_lab']
-    label_test = loadmat(path + "test_img_lab.mat")['test_img_lab']
 
+def get_loader(dataset, features, path, batch_size):
+    # 原文件
+    if dataset == "pascal":
+        img_train = loadmat(path + "train_img.mat")['train_img']
+        img_test = loadmat(path + "test_img.mat")['test_img']
+        text_train = loadmat(path + "train_txt.mat")['train_txt']
+        text_test = loadmat(path + "test_txt.mat")['test_txt']
+        label_train = loadmat(path + "train_img_lab.mat")['train_img_lab']
+        label_test = loadmat(path + "test_img_lab.mat")['test_img_lab']
+    # 新文件
+    elif dataset == "pascal_sentence":
+        img = np.load(path + features["image"] + ".npy")
+        text = np.load(path + features["sentence"] + ".npy")
+        label = np.load(path + "labels.npy")
+
+        np.random.seed(123)
+        test_ratio = 0.1
+        shuffled_indices = np.random.permutation(img.shape[0])
+        test_set_size = int(img.shape[0] * test_ratio)
+        test_indices = shuffled_indices[:test_set_size]
+        train_indices = shuffled_indices[test_set_size:]
+
+        img_train = img[train_indices]
+        img_test = img[test_indices]
+        text_train = text[train_indices]
+        text_test = text[test_indices]
+        label_train = label[train_indices]
+        label_test = label[test_indices]
 
     label_train = ind2vec(label_train).astype(int)
     label_test = ind2vec(label_test).astype(int)

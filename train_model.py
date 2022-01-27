@@ -42,7 +42,7 @@ def calc_loss(view1_feature, view2_feature, view1_predict, view2_predict, labels
 
 
 
-def train_model(model, data_loaders, optimizer, alpha, beta, device="cpu", num_epochs=500):
+def train_model(model, data_loaders, optimizer, alpha, beta, device="cpu", num_epochs=30):
     since = time.time()
     # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     test_img_acc_history = []

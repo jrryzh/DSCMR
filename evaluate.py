@@ -1,5 +1,7 @@
 import numpy as np
 import scipy
+import scipy.spatial
+
 def fx_calc_map_label(image, text, label, k = 0, dist_method='COS'):
   if dist_method == 'L2':
     dist = scipy.spatial.distance.cdist(image, text, 'euclidean')
